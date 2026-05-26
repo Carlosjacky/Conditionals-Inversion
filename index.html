@@ -98,11 +98,13 @@
     </header>
 
     <div class="nav-tabs">
-        <button class="tab-btn active" onclick="switchGame('cheat-sheet')">📖 語法秘笈</button>
-        <button class="tab-btn" onclick="switchGame('cond-game')">🎮 決策模擬 (Conditionals)</button>
-        <button class="tab-btn" onclick="switchGame('inv-game')">💼 專業倒裝 (Inversion)</button>
+        <!-- 修正處：傳遞 this 作為參數 -->
+        <button class="tab-btn active" onclick="switchGame('cheat-sheet', this)">📖 語法秘笈</button>
+        <button class="tab-btn" onclick="switchGame('cond-game', this)">🎮 決策模擬 (Conditionals)</button>
+        <button class="tab-btn" onclick="switchGame('inv-game', this)">💼 專業倒裝 (Inversion)</button>
     </div>
 
+    <!-- 模組 1: Cheat Sheet -->
     <div id="cheat-sheet" class="game-section active">
         <div class="cheat-sheet-container">
             <h2 class="cs-header">📐 假設語氣 (Conditionals) 快速對照表</h2>
@@ -156,6 +158,7 @@
         </div>
     </div>
 
+    <!-- 模組 2: Conditionals Game -->
     <div id="cond-game" class="game-section">
         <div class="card" id="cond-quiz-area">
             <div class="stats-bar"><span id="cond-progress">題目: 1 / 10</span><span id="cond-score">得分: 0</span></div>
@@ -178,6 +181,7 @@
         </div>
     </div>
 
+    <!-- 模組 3: Inversion Game -->
     <div id="inv-game" class="game-section">
         <div class="card" id="inv-quiz-area">
             <div class="stats-bar"><span id="inv-progress">題目: 1 / 10</span><span id="inv-score">得分: 0</span></div>
@@ -230,10 +234,14 @@
         let cState = { idx: 0, score: 0, q: [] };
         let iState = { idx: 0, score: 0, q: [] };
 
-        function switchGame(id) {
+        // 修正處：接收 btn 元素作為第二個參數
+        function switchGame(id, btnElement) {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
-            event.target.classList.add('active');
+            
+            if (btnElement) {
+                btnElement.classList.add('active');
+            }
             document.getElementById(id).classList.add('active');
 
             if(id === 'cond-game' && cState.q.length === 0) initCond();
@@ -318,4 +326,20 @@
             } else {
                 btn.classList.add('incorrect'); btns[q.ans].classList.add('correct');
                 document.getElementById('inv-exp-title').innerHTML = `❌ 轉換失敗`;
-                document.getElementById('inv-
+                document.getElementById('inv-exp-title').style.color = 'var(--danger-color)';
+            }
+            document.getElementById('inv-score').innerText = `得分: ${iState.score}`;
+            document.getElementById('inv-exp-text').innerHTML = `<b>【解析】</b><br>${q.d}`;
+            document.getElementById('inv-explanation').classList.add('show'); document.getElementById('inv-next-btn').style.display = 'block';
+        }
+        function invNext() {
+            iState.idx++;
+            if (iState.idx < 10) showInv();
+            else {
+                document.getElementById('inv-quiz-area').style.display = 'none'; document.getElementById('inv-result-area').style.display = 'block';
+                document.getElementById('inv-final-score').innerText = `${iState.score} / 100`;
+            }
+        }
+    </script>
+</body>
+</html>
