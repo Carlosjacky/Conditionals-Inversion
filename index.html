@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>假設語氣與專業倒裝 (Conditionals & Inversion Masterclass)</title>
+    <style>
+        :root {
+            --primary-dark: #0f172a; --primary-main: #2563eb; --primary-light: #eff6ff;
+            --accent-purple: #7c3aed; --accent-purple-light: #f3e8ff;
+            --success-color: #16a34a; --danger-color: #dc2626;
+            --text-main: #334155; --text-muted: #64748b;
+            --bg-page: #f8fafc; --card-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
+        body { background-color: var(--bg-page); color: var(--text-main); line-height: 1.6; padding: 20px; }
+
+        header {
+            text-align: center; margin-bottom: 30px; background: linear-gradient(135deg, #1e3a8a, #0f172a);
+            color: white; padding: 40px 20px; border-radius: 20px; box-shadow: var(--card-shadow);
+        }
+        header h1 { font-size: 24pt; margin-bottom: 10px; font-weight: 800; }
+        header p { font-size: 11pt; opacity: 0.9; }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 30px;
+            background: #e2e8f0; padding: 8px; border-radius: 50px; max-width: 700px; margin-left: auto; margin-right: auto;
+        }
+        .tab-btn {
+            flex: 1; min-width: 150px; padding: 12px 20px; border: none; background: transparent; font-size: 11pt; font-weight: 700;
+            color: var(--text-muted); cursor: pointer; border-radius: 40px; transition: 0.3s;
+        }
+        .tab-btn.active { background: white; color: var(--primary-main); box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+
+        .game-section { display: none; max-width: 850px; margin: 0 auto; animation: fadeIn 0.4s ease-out; }
+        .game-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Cheat Sheet Styles */
+        .cheat-sheet-container { background: white; padding: 30px; border-radius: 20px; box-shadow: var(--card-shadow); border: 1px solid #e2e8f0; }
+        .cs-header { border-bottom: 2px solid var(--primary-light); padding-bottom: 15px; margin-bottom: 25px; color: var(--primary-dark); }
+        .cs-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        @media(min-width: 768px) { .cs-grid { grid-template-columns: 1fr 1fr; } }
+        
+        .cs-card { background: var(--bg-page); border-radius: 12px; padding: 20px; border-left: 5px solid var(--primary-main); position: relative; overflow: hidden; }
+        .cs-card.mixed { border-left-color: var(--accent-purple); background: var(--accent-purple-light); }
+        .cs-card.inv { border-left-color: var(--success-color); background: #f0fdf4; }
+        
+        .cs-type { font-size: 14pt; font-weight: 800; color: var(--primary-dark); margin-bottom: 8px; }
+        .mixed .cs-type { color: var(--accent-purple); }
+        .inv .cs-type { color: var(--success-color); }
+        
+        .cs-formula { display: inline-block; background: #dbeafe; color: #1d4ed8; padding: 4px 10px; border-radius: 6px; font-family: monospace; font-weight: bold; font-size: 10.5pt; margin-bottom: 12px; }
+        .mixed .cs-formula { background: #e9d5ff; color: #6b21a8; }
+        .inv .cs-formula { background: #dcfce7; color: #15803d; }
+        
+        .cs-desc { font-size: 10pt; color: var(--text-muted); margin-bottom: 12px; font-weight: 600; }
+        .cs-example { background: white; padding: 12px; border-radius: 8px; font-style: italic; color: #0369a1; font-size: 10pt; border: 1px solid #e0f2fe; }
+
+        /* Quiz Styles */
+        .card { background: white; border-radius: 20px; padding: 30px; box-shadow: var(--card-shadow); margin-bottom: 25px; border: 1px solid #e2e8f0; }
+        .stats-bar { display: flex; justify-content: space-between; border-bottom: 2px dashed #e2e8f0; padding-bottom: 15px; margin-bottom: 20px; font-weight: bold; color: var(--text-muted); }
+        
+        .question-box { background: var(--primary-light); padding: 25px; border-radius: 12px; border-left: 5px solid var(--primary-main); font-size: 15pt; font-weight: 600; margin-bottom: 25px; color: var(--primary-dark); }
+        .question-box mark { background: #fef08a; padding: 2px 6px; border-radius: 4px; color: #854d0e; }
+        .question-box.inv-q { background: white; border: 2px dashed #94a3b8; border-left: 2px dashed #94a3b8; color: #475569; }
+
+        .options-grid { display: grid; grid-template-columns: 1fr; gap: 12px; margin-bottom: 20px; }
+        .btn-option { background: white; border: 2px solid #e2e8f0; padding: 16px 20px; border-radius: 10px; font-size: 11.5pt; font-weight: 600; text-align: left; cursor: pointer; transition: 0.2s; color: var(--text-main); }
+        .btn-option:hover:not(:disabled) { border-color: var(--primary-main); background: #f8fafc; transform: translateY(-2px); }
+        .btn-option:disabled { opacity: 0.6; cursor: not-allowed; }
+        .btn-option.correct { background: #dcfce7 !important; border-color: var(--success-color) !important; color: #14532d !important; }
+        .btn-option.incorrect { background: #fee2e2 !important; border-color: var(--danger-color) !important; color: #7f1d1d !important; }
+
+        .explanation { display: none; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; margin-top: 20px; }
+        .explanation.show { display: block; animation: fadeIn 0.4s; }
+        .exp-title { font-weight: bold; margin-bottom: 10px; font-size: 12pt; }
+        .exp-text { font-size: 11pt; color: #475569; }
+        
+        .next-btn { display: none; width: 100%; padding: 15px; margin-top: 20px; background: var(--primary-main); color: white; border: none; border-radius: 10px; font-size: 12pt; font-weight: bold; cursor: pointer; }
+        .next-btn:hover { background: #1d4ed8; }
+
+        /* Decision Tree Graphic */
+        .tree-graphic { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 15px 0; padding: 15px; background: #f1f5f9; border-radius: 10px; font-weight: bold; color: var(--primary-main); }
+        .tree-arrow { font-size: 20pt; color: #94a3b8; }
+
+        .result-screen { text-align: center; }
+        .score-huge { font-size: 48pt; font-weight: 900; color: var(--primary-main); margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>假設語氣與專業倒裝</h1>
+        <p>Conditionals & Inversion Masterclass (BIM & Engineering Context)</p>
+    </header>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchGame('cheat-sheet')">📖 語法秘笈</button>
+        <button class="tab-btn" onclick="switchGame('cond-game')">🎮 決策模擬 (Conditionals)</button>
+        <button class="tab-btn" onclick="switchGame('inv-game')">💼 專業倒裝 (Inversion)</button>
+    </div>
+
+    <div id="cheat-sheet" class="game-section active">
+        <div class="cheat-sheet-container">
+            <h2 class="cs-header">📐 假設語氣 (Conditionals) 快速對照表</h2>
+            <div class="cs-grid">
+                
+                <div class="cs-card">
+                    <div class="cs-type">Type 0：科學事實/必然結果</div>
+                    <div class="cs-formula">If + 現在式, 現在式</div>
+                    <div class="cs-desc">描述 100% 會發生的客觀真理或系統設定。</div>
+                    <div class="cs-example">If you <b>extract</b> the AutoCAD data, the software <b>generates</b> a report.</div>
+                </div>
+
+                <div class="cs-card">
+                    <div class="cs-type">Type 1：極可能發生的未來</div>
+                    <div class="cs-formula">If + 現在式, will + 原形</div>
+                    <div class="cs-desc">預測未來極可能實現的條件。If 子句用現在代替未來。</div>
+                    <div class="cs-example">If the client <b>changes</b> the requirements tomorrow, we <b>will update</b> the model.</div>
+                </div>
+
+                <div class="cs-card">
+                    <div class="cs-type">Type 2：與「現在」事實相反</div>
+                    <div class="cs-formula">If + 過去式, would + 原形</div>
+                    <div class="cs-desc">表達現在不可能發生的幻想或假設。(be 動詞一律用 were)</div>
+                    <div class="cs-example">If I <b>were</b> the project manager, I <b>would use</b> digital twins immediately.</div>
+                </div>
+
+                <div class="cs-card">
+                    <div class="cs-type">Type 3：檢討「過去」的遺憾</div>
+                    <div class="cs-formula">If + had P.P., would have P.P.</div>
+                    <div class="cs-desc">針對過去發生的事情進行檢討 (如果當時...就不會...)。</div>
+                    <div class="cs-example">If I <b>had brought</b> the drone yesterday, I <b>would have taken</b> better photos.</div>
+                </div>
+
+                <div class="cs-card mixed" style="grid-column: 1 / -1;">
+                    <div class="cs-type">Mixed Conditionals (混合型)</div>
+                    <div class="cs-formula">If + had P.P. (過去的因), would + 原形 (現在的果)</div>
+                    <div class="cs-desc">打破時間線！描述「過去發生的事，如何影響現在的狀態」。</div>
+                    <div class="cs-example">If we <b>had coordinated</b> the structural models last week, we <b>would be</b> ready for the presentation now.</div>
+                </div>
+
+                <div class="cs-card inv" style="grid-column: 1 / -1;">
+                    <div class="cs-type">Inversion (專業倒裝句型)</div>
+                    <div class="cs-formula">省略 If，將助動詞 (Should / Were / Had) 移至句首</div>
+                    <div class="cs-desc">在工程合約、商務電郵中最常見的高級寫法，能顯著提升專業度。</div>
+                    <div class="cs-example" style="margin-bottom:8px;"><b>Type 1 萬一：</b><br>If you should need data... ➔ <b>Should you need</b> data...</div>
+                    <div class="cs-example" style="margin-bottom:8px;"><b>Type 2 假設：</b><br>If the project were to fail... ➔ <b>Were the project to fail</b>...</div>
+                    <div class="cs-example"><b>Type 3 遺憾：</b><br>If I had known the error... ➔ <b>Had I known</b> the error...</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="cond-game" class="game-section">
+        <div class="card" id="cond-quiz-area">
+            <div class="stats-bar"><span id="cond-progress">題目: 1 / 10</span><span id="cond-score">得分: 0</span></div>
+            <div class="question-box" id="cond-question">Loading...</div>
+            <div class="options-grid" id="cond-options"></div>
+            
+            <div class="explanation" id="cond-explanation">
+                <div class="exp-title" id="cond-exp-title"></div>
+                <div class="tree-graphic">
+                    <span id="cond-tree-if">If 條件</span><span class="tree-arrow">➔</span><span id="cond-tree-main">結果</span>
+                </div>
+                <div class="exp-text" id="cond-exp-text"></div>
+            </div>
+            <button class="next-btn" id="cond-next-btn" onclick="condNext()">下一題</button>
+        </div>
+        <div class="card result-screen" id="cond-result-area" style="display:none;">
+            <h2>🎉 決策模擬完成！</h2>
+            <div class="score-huge" id="cond-final-score">0 / 100</div>
+            <button class="next-btn" style="display:block" onclick="initCond()">重新挑戰</button>
+        </div>
+    </div>
+
+    <div id="inv-game" class="game-section">
+        <div class="card" id="inv-quiz-area">
+            <div class="stats-bar"><span id="inv-progress">題目: 1 / 10</span><span id="inv-score">得分: 0</span></div>
+            <div style="font-size:10pt; color:var(--text-muted); font-weight:bold; margin-bottom:8px;">請將以下句子改寫為最專業的倒裝句 (Inversion)：</div>
+            <div class="question-box inv-q" id="inv-question">Loading...</div>
+            <div class="options-grid" id="inv-options"></div>
+            
+            <div class="explanation" id="inv-explanation">
+                <div class="exp-title" id="inv-exp-title"></div>
+                <div class="exp-text" id="inv-exp-text"></div>
+            </div>
+            <button class="next-btn" id="inv-next-btn" onclick="invNext()">下一題</button>
+        </div>
+        <div class="card result-screen" id="inv-result-area" style="display:none;">
+            <h2>🏆 專業倒裝句大師！</h2>
+            <div class="score-huge" id="inv-final-score">0 / 100</div>
+            <button class="next-btn" style="display:block" onclick="initInv()">重新挑戰</button>
+        </div>
+    </div>
+
+    <script>
+        // --- 題庫資料庫 ---
+        const condBank = [
+            { q: "If the client <mark>changes</mark> the design requirements tomorrow, we _______ to rerun the entire 3D simulation.", opts: ["will need", "would need", "would have needed"], ans: 0, type: "Type 1 (真實未來)", tIf: "現在式 (changes)", tMain: "未來式 (will need)", d: "極可能發生在未來的真實條件句。If 子句用現在式代替未來，主要子句用 will + V。" },
+            { q: "If we <mark>had</mark> more budget for the project right now, we _______ the server infrastructure immediately.", opts: ["will upgrade", "would upgrade", "would have upgraded"], ans: 1, type: "Type 2 (與現在事實相反)", tIf: "過去式 (had)", tMain: "would + 原形", d: "描述目前不可能發生的假設。If 子句用過去式，主要子句用 would + 原形。" },
+            { q: "If the technical team <mark>had caught</mark> the coding error earlier last week, the system _______ during the presentation.", opts: ["would not crash", "will not crash", "would not have crashed"], ans: 2, type: "Type 3 (與過去事實相反)", tIf: "過去完成式", tMain: "would have + P.P.", d: "檢討過去的遺憾。當時沒發現錯誤，所以系統當機了。主要子句必須使用 would have + 過去分詞。"},
+            { q: "If you <mark>heat</mark> water to 100 degrees Celsius, it _______.", opts: ["boils", "will boil", "would boil"], ans: 0, type: "Type 0 (普遍真理)", tIf: "現在式", tMain: "現在式", d: "描述不變的科學真理或必然結果時，If 子句和主要子句都使用現在簡單式。" },
+            { q: "If he <mark>had studied</mark> harder for the certification last year, he _______ a senior manager now.", opts: ["would have been", "would be", "will be"], ans: 1, type: "Mixed Conditional (混合型)", tIf: "過去完成式(過去)", tMain: "would + 原形(現在)", d: "If 子句與「過去」相反，但影響的是「現在」的結果 (now)，主要子句用 Type 2 的 would be。" },
+            { q: "If the digital twin model <mark>is</mark> approved by the board today, the construction phase _______ next Monday.", opts: ["would begin", "would have begun", "will begin"], ans: 2, type: "Type 1 (真實未來)", tIf: "現在式", tMain: "未來式", d: "基於今天可能發生的真實條件來預測未來，使用 Type 1。" },
+            { q: "If I <mark>were</mark> the lead architect, I _______ a more sustainable material for the facade.", opts: ["will choose", "would choose", "would have chosen"], ans: 1, type: "Type 2 (與現在事實相反)", tIf: "過去式 (were)", tMain: "would + 原形", d: "我現在不是首席建築師，這是純粹的幻想。Type 2 中 be 動詞一律建議用 were。" },
+            { q: "If the company <mark>had invested</mark> in cybersecurity two years ago, the data breach _______.", opts: ["would not happen", "will not happen", "would not have happened"], ans: 2, type: "Type 3 (與過去事實相反)", tIf: "過去完成式", tMain: "would have + P.P.", d: "兩年前沒有投資，導致了過去的資料外洩，純粹檢討過去的因果。" },
+            { q: "If you <mark>press</mark> this emergency button, the assembly line _______ immediately.", opts: ["stops", "would stop", "would have stopped"], ans: 0, type: "Type 0 (機械操作)", tIf: "現在式", tMain: "現在式", d: "機器的固定操作邏輯，按鈕一按機器必停，屬於 Type 0 的固定因果。" },
+            { q: "If they <mark>had not missed</mark> their flight yesterday, they _______ attending the conference right now.", opts: ["would have been", "will be", "would be"], ans: 2, type: "Mixed Conditional (混合型)", tIf: "過去的假設", tMain: "現在的結果", d: "過去沒趕上飛機，導致「現在」無法參加會議。因此後面接 would be (現在進行的假設)。" }
+        ];
+
+        const invBank = [
+            { q: "If you should require further BIM data, please contact me.", opts: ["Should you require further BIM data, please contact me.", "If should you require further BIM data, please contact me.", "Require you should further BIM data, please contact me."], ans: 0, d: "省略 If，直接將助動詞 Should 移到主詞 (you) 前面，是商務信件最標準寫法。" },
+            { q: "If the project were to fail, we would need an alternative plan.", opts: ["To fail were the project, we would need an alternative plan.", "Were the project to fail, we would need an alternative plan.", "If were the project to fail, we would need an alternative plan."], ans: 1, d: "省略 If，將 Were 移至句首。這表達了極低的假設可能性。" },
+            { q: "If I had known the server would crash, I would have taken a backup.", opts: ["Had known I the server would crash, I would have taken a backup.", "Had I known the server would crash, I would have taken a backup.", "Have I known the server would crash, I would have taken a backup."], ans: 1, d: "Type 3 的倒裝，省略 If，將 Had 移至主詞 (I) 前面。" },
+            { q: "If it had not been for your technical input, the system would have failed.", opts: ["Had not it been for your technical input...", "Had it not been for your technical input...", "Not had it been for your technical input..."], ans: 1, d: "這是一個固定高級句型，表示「要不是因為...」。否定詞 not 必須留在主詞 it 後面。" },
+            { q: "If the board should approve the digital twin model today, we will start next week.", opts: ["Should the board approve the digital twin model today...", "Should approve the board the digital twin model today...", "Board should approve the digital twin model today..."], ans: 0, d: "將 Should 移至主詞 the board 前方，專業且精簡。" },
+            { q: "If I were in your position, I would delay the software update.", opts: ["Were I in your position, I would delay the software update.", "Was I in your position, I would delay the software update.", "If were I in your position, I would delay the software update."], ans: 0, d: "Type 2 的倒裝，直接將 Were 移至句首。" },
+            { q: "If the contractor had submitted the simulation earlier, we would be ready now.", opts: ["Had submitted the contractor the simulation earlier...", "Had the contractor submitted the simulation earlier...", "The contractor had submitted the simulation earlier..."], ans: 1, d: "Mixed 條件句的倒裝，將 Had 移至主詞 the contractor 之前。" },
+            { q: "If there should be any delay in material delivery, notify the manager.", opts: ["Should there be any delay in material delivery...", "Should be there any delay in material delivery...", "If should there be any delay in material delivery..."], ans: 0, d: "含有 there be 句型時，Should 移至 there 之前。" },
+            { q: "If we were to lose the contract, it would be a disaster.", opts: ["Were we to lose the contract...", "Were to we lose the contract...", "If we were lose the contract..."], ans: 0, d: "Were to 句型的倒裝，只移動 Were，保留 to V 在原位。" },
+            { q: "If he had not resigned, he would have been promoted.", opts: ["Had not he resigned...", "Had he not resigned...", "Not had he resigned..."], ans: 1, d: "否定詞 not 在倒裝句中通常要留在主詞 (he) 之後，除非使用縮寫 (Hadn't he...，但在正式寫作中少用縮寫)。" }
+        ];
+
+        // --- 遊戲邏輯引擎 ---
+        let cState = { idx: 0, score: 0, q: [] };
+        let iState = { idx: 0, score: 0, q: [] };
+
+        function switchGame(id) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.game-section').forEach(s => s.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(id).classList.add('active');
+
+            if(id === 'cond-game' && cState.q.length === 0) initCond();
+            if(id === 'inv-game' && iState.q.length === 0) initInv();
+        }
+
+        // Cond Game
+        function initCond() {
+            cState.q = [...condBank].sort(()=>0.5-Math.random()); cState.idx = 0; cState.score = 0;
+            document.getElementById('cond-result-area').style.display = 'none'; document.getElementById('cond-quiz-area').style.display = 'block';
+            showCond();
+        }
+        function showCond() {
+            const q = cState.q[cState.idx];
+            document.getElementById('cond-progress').innerText = `題目: ${cState.idx + 1} / 10`;
+            document.getElementById('cond-score').innerText = `得分: ${cState.score}`;
+            document.getElementById('cond-question').innerHTML = q.q;
+            
+            const optBox = document.getElementById('cond-options'); optBox.innerHTML = '';
+            q.opts.forEach((opt, idx) => {
+                let btn = document.createElement('button'); btn.className = 'btn-option'; btn.innerText = opt;
+                btn.onclick = () => handleCond(btn, idx, q); optBox.appendChild(btn);
+            });
+            document.getElementById('cond-explanation').classList.remove('show');
+            document.getElementById('cond-next-btn').style.display = 'none';
+        }
+        function handleCond(btn, idx, q) {
+            let btns = document.getElementById('cond-options').children;
+            for(let b of btns) b.disabled = true;
+
+            if (idx === q.ans) {
+                btn.classList.add('correct'); cState.score += 10;
+                document.getElementById('cond-exp-title').innerHTML = `✅ 答對了！這是 <b>${q.type}</b>`;
+                document.getElementById('cond-exp-title').style.color = 'var(--success-color)';
+            } else {
+                btn.classList.add('incorrect'); btns[q.ans].classList.add('correct');
+                document.getElementById('cond-exp-title').innerHTML = `❌ 答錯了。這是 <b>${q.type}</b>`;
+                document.getElementById('cond-exp-title').style.color = 'var(--danger-color)';
+            }
+            document.getElementById('cond-score').innerText = `得分: ${cState.score}`;
+            document.getElementById('cond-tree-if').innerText = q.tIf; document.getElementById('cond-tree-main').innerText = q.tMain;
+            document.getElementById('cond-exp-text').innerHTML = q.d;
+            document.getElementById('cond-explanation').classList.add('show'); document.getElementById('cond-next-btn').style.display = 'block';
+        }
+        function condNext() {
+            cState.idx++;
+            if (cState.idx < 10) showCond();
+            else {
+                document.getElementById('cond-quiz-area').style.display = 'none'; document.getElementById('cond-result-area').style.display = 'block';
+                document.getElementById('cond-final-score').innerText = `${cState.score} / 100`;
+            }
+        }
+
+        // Inv Game
+        function initInv() {
+            iState.q = [...invBank].sort(()=>0.5-Math.random()); iState.idx = 0; iState.score = 0;
+            document.getElementById('inv-result-area').style.display = 'none'; document.getElementById('inv-quiz-area').style.display = 'block';
+            showInv();
+        }
+        function showInv() {
+            const q = iState.q[iState.idx];
+            document.getElementById('inv-progress').innerText = `題目: ${iState.idx + 1} / 10`;
+            document.getElementById('inv-score').innerText = `得分: ${iState.score}`;
+            document.getElementById('inv-question').innerHTML = q.q;
+            
+            const optBox = document.getElementById('inv-options'); optBox.innerHTML = '';
+            q.opts.forEach((opt, idx) => {
+                let btn = document.createElement('button'); btn.className = 'btn-option'; btn.innerText = opt;
+                btn.onclick = () => handleInv(btn, idx, q); optBox.appendChild(btn);
+            });
+            document.getElementById('inv-explanation').classList.remove('show');
+            document.getElementById('inv-next-btn').style.display = 'none';
+        }
+        function handleInv(btn, idx, q) {
+            let btns = document.getElementById('inv-options').children;
+            for(let b of btns) b.disabled = true;
+
+            if (idx === q.ans) {
+                btn.classList.add('correct'); iState.score += 10;
+                document.getElementById('inv-exp-title').innerHTML = `✅ 轉換成功！`;
+                document.getElementById('inv-exp-title').style.color = 'var(--success-color)';
+            } else {
+                btn.classList.add('incorrect'); btns[q.ans].classList.add('correct');
+                document.getElementById('inv-exp-title').innerHTML = `❌ 轉換失敗`;
+                document.getElementById('inv-
